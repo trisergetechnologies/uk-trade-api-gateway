@@ -1,6 +1,7 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const { env } = require('../config/env');
+const { applyProxyCorsHeaders } = require('../middlewares/cors.middleware');
 
 const router = express.Router();
 
@@ -28,10 +29,14 @@ router.use(
       return `${prefixed}${qs}`;
     },
     on: {
+      proxyRes(proxyRes, req, res) {
+        applyProxyCorsHeaders(req, res);
+      },
       error(err, req, res) {
         if (!res || typeof res.writeHead !== 'function' || res.headersSent) {
           return;
         }
+        applyProxyCorsHeaders(req, res);
         const statusCode = err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' ? 503 : 502;
         res.writeHead(statusCode, { 'Content-Type': 'application/json' });
         res.end(

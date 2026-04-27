@@ -5,11 +5,15 @@ const rateLimit = require('express-rate-limit');
 
 const { env } = require('./config/env');
 const { optionalAuth } = require('./middlewares/auth.middleware');
-const { createCorsMiddleware } = require('./middlewares/cors.middleware');
+const {
+  createPreflightMiddleware,
+  createCorsMiddleware,
+} = require('./middlewares/cors.middleware');
 const routes = require('./routes');
 
 const app = express();
 
+app.use(createPreflightMiddleware());
 app.use(createCorsMiddleware());
 app.use(
   helmet({
