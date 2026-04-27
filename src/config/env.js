@@ -11,6 +11,22 @@ const env = {
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 200),
   /** Outgoing proxy socket timeout (ms). Fails fast if the backend is down. */
   proxyTimeoutMs: Number(process.env.PROXY_TIMEOUT_MS || 20_000),
+  corsOrigins: (() => {
+    const raw = process.env.CORS_ORIGINS;
+    if (raw === undefined || String(raw).trim() === '') {
+      return [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'https://uktrade.co.in',
+        'https://www.uktrade.co.in',
+      ];
+    }
+    return String(raw)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  })(),
+  corsAllowAll: process.env.CORS_ALLOW_ALL === 'true' || process.env.CORS_ALLOW_ALL === '1',
 };
 
 module.exports = { env };
